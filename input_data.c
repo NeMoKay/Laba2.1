@@ -3,17 +3,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include "input_data.h"
+#include "dinamic_massive.h"
 
 
-typedef struct{
-    void* Re;
-    void* Im;
-    void (*print)(const void*, int);
-    void* (*summ)(const void*, const void*);
-    void* (*multiply)(const void*, const void*);
-    void (*scalar_multiply)(float, void*);
 
-}Complex_number;
 
 void float_print(const void* Stuct_Re1, int epsilon_num){
     const Complex_number *number = (const Complex_number*)Stuct_Re1;
@@ -71,10 +65,12 @@ void* float_multiply(const void* Stuct_Re1, const void* Stuct_Re2){
 }
 
 void float_scalar_multiply(float scalar, void* Struct_Re1){
+
     Complex_number* number = (Complex_number*)Struct_Re1;
     *(float*)(*number).Re = scalar * (*(float*)(*number).Re);
 
 }
+
 void Complex_print(const void* Comlex1, int epsilon_num){    
     const Complex_number* number = (const Complex_number*)Comlex1;
     float num_Re = *(const float*)(*number).Re;
@@ -161,6 +157,7 @@ void Complex_scalar_multiply(float scalar, void* Struct){
     *(float*)(*number).Im = scalar * (*(float*)(*number).Im);
 
 }
+
 Complex_number* create_float(float Real){
     Complex_number *Struct_for_num = malloc(sizeof(Complex_number));
     (*Struct_for_num).Re = malloc(sizeof(float));
@@ -224,6 +221,7 @@ int question(char* question){
         return 0;
     }
 }
+
 void draw_matrix(int tipe_matrix, Complex_number* matrix, int rank_matrix, int epsilon_num){
     printf("\n");
     if(tipe_matrix == 0){
@@ -261,10 +259,12 @@ float input_number(float min_side, float max_side){
     num = ((int)(num*1000)) / 1000.0;
     return num;
 }
+
 Complex_number* create_matrix(int rank_matrix, int epsilon_num, int question_of_type){
     
     int question_of_random;
-    Complex_number *matrix = malloc(rank_matrix * rank_matrix * sizeof(Complex_number));
+    int len_matrix = 0;
+    Complex_number *matrix = gen_massive();
 
     question_of_random = question("Введите < y > если заполнить матрицу рандомом или < n > если вводить вручную : ");
 
@@ -278,7 +278,8 @@ Complex_number* create_matrix(int rank_matrix, int epsilon_num, int question_of_
                     printf("Введите a%d%d (Im): ", i+1, k+1);
                     Im = input_number(-1 * epsilon_num, epsilon_num);
 
-                    int index = i * rank_matrix + k;
+                    matrix = add_forward(matrix, &len_matrix);
+                    int index = len_matrix - 1;
 
                     matrix[index].Re = malloc(sizeof(float));
                     matrix[index].Im = malloc(sizeof(float));
@@ -305,7 +306,9 @@ Complex_number* create_matrix(int rank_matrix, int epsilon_num, int question_of_
                     printf("\nВведите a%d%d : ", i+1, k+1);
                     Re = input_number(-epsilon_num, epsilon_num);
 
-                    int index = i*rank_matrix + k;
+                    matrix = add_forward(matrix, &len_matrix);
+                    int index = len_matrix - 1;
+
                     matrix[index].Re = malloc(sizeof(float));
                     matrix[index].Im = NULL;
                     matrix[index].print = float_print;
@@ -328,7 +331,9 @@ Complex_number* create_matrix(int rank_matrix, int epsilon_num, int question_of_
                     Re = (rand() % (2 * epsilon_num + 1)) - epsilon_num;
                     Im = (rand() % (2 * epsilon_num + 1)) - epsilon_num;
 
-                    int index = i * rank_matrix + k;
+                    matrix = add_forward(matrix, &len_matrix);
+                    int index = len_matrix - 1;
+
 
                     matrix[index].Re = malloc(sizeof(float));
                     matrix[index].Im = malloc(sizeof(float));
@@ -349,7 +354,9 @@ Complex_number* create_matrix(int rank_matrix, int epsilon_num, int question_of_
 
                     Re = (rand() % (2 * epsilon_num + 1)) - epsilon_num;
                     
-                    int index = i*rank_matrix + k;
+                    matrix = add_forward(matrix, &len_matrix);
+                    int index = len_matrix - 1;
+
                     matrix[index].Re = malloc(sizeof(float));
                     matrix[index].Im = NULL;
                     matrix[index].print = float_print;
@@ -372,7 +379,7 @@ int input_data(){
 
     const int max_rank_of_matrix = 10, epsilon_num = 100;
 
-    int len_counter = 0, rank_matrix = 0, question_of_type;
+    int len_counter = 0, rank_matrix = 0, question_of_type, len_matrix = 0;
     char question_start[2], char_buffer;
     float scalar = 0.0;
 
@@ -470,7 +477,7 @@ int input_data(){
                     result[index].scalar_multiply = matrix1[indexA].scalar_multiply;
 
                     for(k = 1; k < rank_matrix; k++){
-                        
+
                         indexA = i * rank_matrix + k;
                         indexB = k * rank_matrix + j;
                         copy = matrix1[indexA].multiply(&matrix1[indexA], matrix2 + indexB);

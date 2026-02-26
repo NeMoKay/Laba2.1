@@ -1,5 +1,5 @@
 CC = gcc-15
-SOURCES = main.c input_data.c test.c
+SOURCES = main.c input_data.c dinamic_massive.c
 TARGET = main
 
 all: $(TARGET)
