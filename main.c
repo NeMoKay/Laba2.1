@@ -3,5 +3,4 @@
 
 int main(){
     input_data();
-
 }

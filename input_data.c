@@ -6,9 +6,6 @@
 #include "input_data.h"
 #include "dinamic_massive.h"
 
-
-
-
 void float_print(const void* Stuct_Re1, int epsilon_num){
     const Complex_number *number = (const Complex_number*)Stuct_Re1;
     float num = *(const float*)(*number).Re;
@@ -155,7 +152,6 @@ void Complex_scalar_multiply(float scalar, void* Struct){
     Complex_number* number = (Complex_number*)Struct;
     *(float*)(*number).Re = scalar * (*(float*)(*number).Re);
     *(float*)(*number).Im = scalar * (*(float*)(*number).Im);
-
 }
 
 Complex_number* create_float(float Real){
@@ -447,22 +443,19 @@ int input_data(){
             printf("\n ||");
             draw_matrix(1, result, rank_matrix, epsilon_num);
         }
+        
         else{
-
             for(int i = 0; i < rank_matrix; i++){
                 for(int j = 0; j < rank_matrix; j++){
-
                     int index = i * rank_matrix + j;
-                    int k = 0;
 
+                    int k = 0;
                     int indexA = i * rank_matrix + k;
                     int indexB = k * rank_matrix + j;
-
-                    Complex_number *copy = matrix1[indexA].multiply(&matrix1[indexA], matrix2 + indexB);
+                    Complex_number *copy = matrix1[indexA].multiply(matrix1 + indexA, &matrix2[indexB]);
 
                     result[index].Re = malloc(sizeof(float));
                     *(float*)result[index].Re = *(float*)(*copy).Re;
-
                     if((*copy).Im != NULL){
                         result[index].Im = malloc(sizeof(float));
                         *(float*)result[index].Im = *(float*)(*copy).Im;
@@ -470,23 +463,30 @@ int input_data(){
                     else{
                         result[index].Im = NULL;
                     }
-
                     result[index].print = matrix1[indexA].print;
                     result[index].summ = matrix1[indexA].summ;
                     result[index].multiply = matrix1[indexA].multiply;
                     result[index].scalar_multiply = matrix1[indexA].scalar_multiply;
 
+                    if((*copy).Im != NULL){
+                        free((*copy).Im);
+                    }
+                    free((*copy).Re);
+                    free(copy);
                     for(k = 1; k < rank_matrix; k++){
-
                         indexA = i * rank_matrix + k;
                         indexB = k * rank_matrix + j;
-                        copy = matrix1[indexA].multiply(&matrix1[indexA], matrix2 + indexB);
+                        copy = matrix1[indexA].multiply(&matrix1[indexA], &matrix2[indexB]);
 
                         Complex_number *sum = result[index].summ(&result[index], copy);
 
+                        if(result[index].Im != NULL){
+                            free(result[index].Im);
+                        }
+                        free(result[index].Re);
+
                         result[index].Re = malloc(sizeof(float));
                         *(float*)result[index].Re = *(float*)(*sum).Re;
-
                         if((*sum).Im != NULL){
                             result[index].Im = malloc(sizeof(float));
                             *(float*)result[index].Im = *(float*)(*sum).Im;
@@ -495,33 +495,19 @@ int input_data(){
                             result[index].Im = NULL;
                         }
 
-
-                        if(result[index].Im != NULL){
-                            free(result[index].Im);
-                        }
-                        free(result[index].Re);
-
-
-                        if((*copy).Im != NULL){
-                            free((*copy).Im);
-                        }
-                        free((*copy).Re);
-                        free(copy);
-
                         if((*sum).Im != NULL){
                             free((*sum).Im);
                         }
                         free((*sum).Re);
                         free(sum);
-
-                        if((*copy).Im != NULL){
-                            free((*copy).Im);
-                        }
+                        
+                        if((*copy).Im != NULL) free((*copy).Im);
                         free((*copy).Re);
                         free(copy);
                     }
                 }
             }
+
             draw_matrix(1, matrix1, rank_matrix, epsilon_num);
             printf("\n  *");
             draw_matrix(1, matrix2, rank_matrix, epsilon_num);

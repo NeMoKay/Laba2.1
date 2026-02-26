@@ -32,4 +32,3 @@ Complex_number *add_forward(Complex_number *first_address, int *len_massive){
     (*len_massive)++;
     return debug;
 }
-    
