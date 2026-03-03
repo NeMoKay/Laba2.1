@@ -5,7 +5,7 @@
 typedef struct{
     void* Re;
     void* Im;
-    void (*print)(const void*, int);
+    char* (*print)(const void*, int);
     void* (*summ)(const void*, const void*);
     void* (*multiply)(const void*, const void*);
     void (*scalar_multiply)(float, void*);

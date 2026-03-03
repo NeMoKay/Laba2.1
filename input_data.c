@@ -6,7 +6,7 @@
 #include "dinamic_massive.h"
 
 
-void float_print(const void* Stuct_Re1, int epsilon_num){
+char* float_print(const void* Stuct_Re1, int epsilon_num){
     const Complex_number *number = (const Complex_number*)Stuct_Re1;
     float num = *(const float*)(*number).Re;
     int int_num = (int)num, len_epsilon = 0, len_num = 0, epsilon = epsilon_num, start_i = 0;
@@ -21,7 +21,7 @@ void float_print(const void* Stuct_Re1, int epsilon_num){
     }
     char *p_string = malloc(len_epsilon + 4);
     if (p_string == NULL) {
-        // return NULL;
+        return NULL;
     }
 
     for(int i = 0; i < len_epsilon - len_num; i++){
@@ -34,9 +34,7 @@ void float_print(const void* Stuct_Re1, int epsilon_num){
     else{
         sprintf(p_string + start_i, " %.2f", num);
     }
-
-    printf("%s", p_string);
-    // return p_string;
+    return p_string;
 }
  
 void* float_summ(const void* Stuct_Re1, const void* Stuct_Re2){
@@ -70,7 +68,7 @@ void float_scalar_multiply(float scalar, void* Struct_Re1){
 
 }
 
-void Complex_print(const void* Comlex1, int epsilon_num) {
+char* Complex_print(const void* Comlex1, int epsilon_num) {
     const Complex_number* number = (const Complex_number*)Comlex1;
     float num_Re = *(const float*)(*number).Re;
     float num_Im = *(const float*)(*number).Im;
@@ -98,7 +96,7 @@ void Complex_print(const void* Comlex1, int epsilon_num) {
     }
     char *p_string = malloc(len_epsilon_Re + 9 + len_epsilon_Im);
     if(p_string == NULL){
-        // return NULL;
+        return NULL;
     }
     int index = 0;
     for(int i = 0; i < len_epsilon_Re - len_num_Re; i++){
@@ -121,8 +119,7 @@ void Complex_print(const void* Comlex1, int epsilon_num) {
         p_string[index++] = ' ';
     }
     p_string[index] = '\0';
-    printf("%s", p_string);
-    // return p_string;
+    return p_string;
 }
 
 void* Complex_summ(const void* Comlex1, const void* Comlex2){
@@ -225,6 +222,9 @@ int question(char* question){
 }
 
 void draw_matrix(int tipe_matrix, Complex_number* matrix, int rank_matrix, int epsilon_num){
+
+    char *result_print;
+
     printf("\n");
     if(tipe_matrix == 0){
         printf("Шаблон заполнения матрицы : \n");
@@ -241,9 +241,8 @@ void draw_matrix(int tipe_matrix, Complex_number* matrix, int rank_matrix, int e
             printf("\n|");
             for (int k = 0; k < rank_matrix; k++) {
                 int index = i * rank_matrix + k;
-                matrix[index].print(&matrix[index], epsilon_num);
-                // print(matrix[index], eps)
-                printf(" ");
+                result_print = matrix[index].print(&matrix[index], epsilon_num);
+                printf("%s ", result_print);
             }
             printf("|");
         }
@@ -363,10 +362,7 @@ Complex_number* create_matrix(int rank_matrix, int epsilon_num, int question_of_
     return matrix;
 }
 
-
-//------------------------------------------------
-
-Complex_number* matrix_add_operation(Complex_number* matrix1, Complex_number* matrix2, int rank_matrix){
+Complex_number* matrix_summ(Complex_number* matrix1, Complex_number* matrix2, int rank_matrix){
     Complex_number *result = malloc(rank_matrix * rank_matrix * sizeof(Complex_number));
     if(result == NULL){
         return NULL;
@@ -404,7 +400,7 @@ Complex_number* matrix_add_operation(Complex_number* matrix1, Complex_number* ma
     return result;
 }
 
-Complex_number* matrix_multiply_operation(Complex_number* matrix1, Complex_number* matrix2, int rank_matrix){
+Complex_number* matrix_multiply(Complex_number* matrix1, Complex_number* matrix2, int rank_matrix){
     Complex_number *result = malloc(rank_matrix * rank_matrix * sizeof(Complex_number));
     if(result == NULL){
         return NULL;
@@ -522,6 +518,8 @@ Complex_number* matrix_scalar_multiply(Complex_number* matrix, float scalar, int
     return result;
 }
 
+//------------------------------------------------
+
 int input_data(){
     srand(time(NULL));
 
@@ -571,7 +569,7 @@ int input_data(){
 
         if (question_start[0] == 's'){
 
-            result = matrix_add_operation(matrix1, matrix2, rank_matrix);
+            result = matrix_summ(matrix1, matrix2, rank_matrix);
             draw_matrix(1, matrix1, rank_matrix, epsilon_num);
             printf("\n  +");
             draw_matrix(1, matrix2, rank_matrix, epsilon_num);
@@ -581,7 +579,7 @@ int input_data(){
         }
 
         else{
-            result = matrix_multiply_operation(matrix1, matrix2, rank_matrix);
+            result = matrix_multiply(matrix1, matrix2, rank_matrix);
             draw_matrix(1, matrix1, rank_matrix, epsilon_num);
             printf("\n  *");
             draw_matrix(1, matrix2, rank_matrix, epsilon_num);
