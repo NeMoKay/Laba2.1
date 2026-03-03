@@ -19,16 +19,8 @@ Complex_number *add_forward(Complex_number *first_address, int *len_massive){
         return NULL;
     }
     int new_index = *len_massive;
-
-    (*(debug + new_index)).Re = malloc(sizeof(float));
-    debug[new_index].Im = malloc(sizeof(float));
-
-    if(debug[new_index].Re == NULL){
-        return NULL;
-    }
-    if(debug[new_index].Im == NULL){
-        return NULL;    
-    }
+    debug[new_index].Re = NULL;
+    debug[new_index].Im = NULL;
     (*len_massive)++;
     return debug;
 }

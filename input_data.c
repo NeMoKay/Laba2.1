@@ -1,15 +1,15 @@
-
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+
 #include "input_data.h"
 #include "dinamic_massive.h"
+
 
 void float_print(const void* Stuct_Re1, int epsilon_num){
     const Complex_number *number = (const Complex_number*)Stuct_Re1;
     float num = *(const float*)(*number).Re;
-    int int_num = (int)num, len_epsilon = 0, len_num = 0, epsilon = epsilon_num;
+    int int_num = (int)num, len_epsilon = 0, len_num = 0, epsilon = epsilon_num, start_i = 0;
 
     while(epsilon / 10 != 0){
         epsilon = epsilon / 10;
@@ -19,19 +19,24 @@ void float_print(const void* Stuct_Re1, int epsilon_num){
             len_num++;
         }
     }
-    for(int i = 0; i < len_epsilon - len_num; i++){
-        printf(" ");
+    char *p_string = malloc(len_epsilon + 4);
+    if (p_string == NULL) {
+        // return NULL;
     }
-    
 
+    for(int i = 0; i < len_epsilon - len_num; i++){
+        p_string[i] = ' ';
+        start_i++;
+    }
     if(num < 0){
-        printf("%.2f", num);
+        sprintf(p_string + start_i, "%.2f", num);
     }
     else{
-        printf(" %.2f", num);
+        sprintf(p_string + start_i, " %.2f", num);
     }
-    
 
+    printf("%s", p_string);
+    // return p_string;
 }
  
 void* float_summ(const void* Stuct_Re1, const void* Stuct_Re2){
@@ -39,8 +44,6 @@ void* float_summ(const void* Stuct_Re1, const void* Stuct_Re2){
     Complex_number *rezult = malloc(sizeof(Complex_number));
     const Complex_number *number1 = (const Complex_number*)Stuct_Re1;
     const Complex_number *number2 = (const Complex_number*)Stuct_Re2;
-
-
 
     (*rezult).Re = malloc(sizeof(float));
     (*rezult).Im = NULL;
@@ -52,7 +55,6 @@ void* float_multiply(const void* Stuct_Re1, const void* Stuct_Re2){
     Complex_number *rezult = malloc(sizeof(Complex_number));
     const Complex_number *number1 = (const Complex_number*)Stuct_Re1;
     const Complex_number *number2 = (const Complex_number*)Stuct_Re2;
-
 
     (*rezult).Re = malloc(sizeof(float));
     (*rezult).Im = NULL;
@@ -68,54 +70,59 @@ void float_scalar_multiply(float scalar, void* Struct_Re1){
 
 }
 
-void Complex_print(const void* Comlex1, int epsilon_num){    
+void Complex_print(const void* Comlex1, int epsilon_num) {
     const Complex_number* number = (const Complex_number*)Comlex1;
     float num_Re = *(const float*)(*number).Re;
     float num_Im = *(const float*)(*number).Im;
 
-    int int_num_Re = (int)(num_Re);
-    int int_num_Im = (int)(num_Im);
+    int int_num_Re = (int)num_Re, int_num_Im = (int)num_Im;
+    int len_epsilon_Re = 0, len_num_Re = 0;
+    int len_epsilon_Im = 0, len_num_Im = 0;
+    int epsilon_Re = epsilon_num, epsilon_Im = epsilon_num;
 
-
-    int epsilon_Re = epsilon_num, len_num_Re = 0, len_epsilon = 0;
     while(epsilon_Re / 10 != 0){
-        epsilon_Re = epsilon_Re / 10;
-        len_epsilon++;
-        if(int_num_Re / 10 != 0){
+        epsilon_Re /= 10;
+        len_epsilon_Re++;
+        if (int_num_Re / 10 != 0){
             int_num_Re = int_num_Re / 10;
             len_num_Re++;
         }
     }
-    for(int i = 0; i < len_epsilon - len_num_Re; i++){
-        printf(" ");
-    }
-    if(num_Re < 0){
-        printf("%.2f", num_Re);
-    }
-    else{
-        printf(" %.2f", num_Re);
-    }
-
-    len_epsilon = 0;
-
-    int epsilon_Im = epsilon_num, len_num_Im = 0;
     while(epsilon_Im / 10 != 0){
-        epsilon_Im = epsilon_Im / 10;
-        len_epsilon++;
-        if(int_num_Im / 10 != 0){
+        epsilon_Im /= 10;
+        len_epsilon_Im++;
+        if (int_num_Im / 10 != 0){
             int_num_Im = int_num_Im / 10;
             len_num_Im++;
         }
     }
-    if(num_Im < 0){
-        printf("%.2fi", num_Im);
+    char *p_string = malloc(len_epsilon_Re + 9 + len_epsilon_Im);
+    if(p_string == NULL){
+        // return NULL;
+    }
+    int index = 0;
+    for(int i = 0; i < len_epsilon_Re - len_num_Re; i++){
+        p_string[index++] = ' ';
+    }
+
+    if(num_Re < 0){
+        index += sprintf(p_string + index, "%.2f", num_Re);
     }
     else{
-        printf("+%.2fi", num_Im);
+        index += sprintf(p_string + index, " %.2f", num_Re);
     }
-    for(int i = 0; i < len_epsilon - len_num_Im; i++){
-        printf(" ");
+    if(num_Im < 0){
+        index += sprintf(p_string + index, "%.2fi", num_Im);
     }
+    else{
+        index += sprintf(p_string + index, "+%.2fi", num_Im);
+    }
+    for(int i = 0; i < len_epsilon_Im - len_num_Im; i++){
+        p_string[index++] = ' ';
+    }
+    p_string[index] = '\0';
+    printf("%s", p_string);
+    // return p_string;
 }
 
 void* Complex_summ(const void* Comlex1, const void* Comlex2){
@@ -132,7 +139,7 @@ void* Complex_summ(const void* Comlex1, const void* Comlex2){
     return rezult;
 }
 
-void* Complex_multiply(const void* Comlex1, const void* Comlex2){
+void* Complex_multiply(const void* Comlex1, const void* Comlex2){   
 
     Complex_number *rezult = malloc(sizeof(Complex_number));
     Complex_number *number1 = (Complex_number*)Comlex1;
@@ -180,8 +187,7 @@ Complex_number* create_Complex(float Real, float Imag){
     (*Struct_for_complex).summ = Complex_summ;
     (*Struct_for_complex).multiply = Complex_multiply;
      (*Struct_for_complex).scalar_multiply = Complex_scalar_multiply;
-    
-
+     
     return Struct_for_complex;
 }
 
@@ -236,6 +242,7 @@ void draw_matrix(int tipe_matrix, Complex_number* matrix, int rank_matrix, int e
             for (int k = 0; k < rank_matrix; k++) {
                 int index = i * rank_matrix + k;
                 matrix[index].print(&matrix[index], epsilon_num);
+                // print(matrix[index], eps)
                 printf(" ");
             }
             printf("|");
@@ -256,7 +263,7 @@ float input_number(float min_side, float max_side){
     return num;
 }
 
-Complex_number* create_matrix(int rank_matrix, int epsilon_num, int question_of_type){
+Complex_number* create_matrix(int rank_matrix, int epsilon_num, int question_of_type){  
     
     int question_of_random;
     int len_matrix = 0;
@@ -277,25 +284,19 @@ Complex_number* create_matrix(int rank_matrix, int epsilon_num, int question_of_
                     matrix = add_forward(matrix, &len_matrix);
                     int index = len_matrix - 1;
 
-                    matrix[index].Re = malloc(sizeof(float));
-                    matrix[index].Im = malloc(sizeof(float));
-                    matrix[index].print = Complex_print;
-                    matrix[index].summ = Complex_summ;
-                    matrix[index].multiply = Complex_multiply;
-                    matrix[index].scalar_multiply = Complex_scalar_multiply;
-
-                    
-
-                    *(float*)matrix[index].Re = Re;
-                    *(float*)matrix[index].Im = Im;
-
-                    // {11}{12}{13}{21}{22}{23}{31}{32}{33}
-                    // 0.  1.  2.  3.  4.  5.  6.  7.  8. 
+                    Complex_number* copy = create_Complex(Re, Im);
+                    matrix[index].Re = (*copy).Re;
+                    matrix[index].Im = (*copy).Im;
+                    matrix[index].print = (*copy).print;
+                    matrix[index].summ = (*copy).summ;
+                    matrix[index].multiply = (*copy).multiply;
+                    matrix[index].scalar_multiply = (*copy).scalar_multiply;
+                    free(copy);
                 }
             }
         }
         else{
-            float Re, Im;
+            float Re;
             for(int i = 0; i < rank_matrix; i++){
                 for(int k = 0; k < rank_matrix; k++){
 
@@ -304,16 +305,14 @@ Complex_number* create_matrix(int rank_matrix, int epsilon_num, int question_of_
 
                     matrix = add_forward(matrix, &len_matrix);
                     int index = len_matrix - 1;
-
-                    matrix[index].Re = malloc(sizeof(float));
+                    Complex_number* copy = create_float(Re);
+                    matrix[index].Re = (*copy).Re;
                     matrix[index].Im = NULL;
-                    matrix[index].print = float_print;
-                    matrix[index].summ = float_summ;
-                    matrix[index].multiply = float_multiply;
-                    matrix[index].scalar_multiply = float_scalar_multiply;
-
-
-                    *(float*)matrix[index].Re = Re;
+                    matrix[index].print = (*copy).print;
+                    matrix[index].summ = (*copy).summ;
+                    matrix[index].multiply = (*copy).multiply;
+                    matrix[index].scalar_multiply = (*copy).scalar_multiply;
+                    free(copy);
                 }
             }
         }
@@ -329,46 +328,199 @@ Complex_number* create_matrix(int rank_matrix, int epsilon_num, int question_of_
 
                     matrix = add_forward(matrix, &len_matrix);
                     int index = len_matrix - 1;
-
-
-                    matrix[index].Re = malloc(sizeof(float));
-                    matrix[index].Im = malloc(sizeof(float));
-                    matrix[index].print = Complex_print;
-                    matrix[index].summ = Complex_summ;
-                    matrix[index].multiply = Complex_multiply;
-                    matrix[index].scalar_multiply = Complex_scalar_multiply;
-
-                    *(float*)matrix[index].Re = Re;
-                    *(float*)matrix[index].Im = Im;
+                    Complex_number* copy = create_Complex(Re, Im);
+                    matrix[index].Re = (*copy).Re;
+                    matrix[index].Im = (*copy).Im;
+                    matrix[index].print = (*copy).print;
+                    matrix[index].summ = (*copy).summ;
+                    matrix[index].multiply = (*copy).multiply;
+                    matrix[index].scalar_multiply = (*copy).scalar_multiply;
+                    free(copy);
                 }
             }
         }
         else{
-            float Re, Im;
+            float Re;
             for(int i = 0; i < rank_matrix; i++){
                 for(int k = 0; k < rank_matrix; k++){
-
                     Re = (rand() % (2 * epsilon_num + 1)) - epsilon_num;
-                    
                     matrix = add_forward(matrix, &len_matrix);
+
                     int index = len_matrix - 1;
 
-                    matrix[index].Re = malloc(sizeof(float));
+                    Complex_number* copy = create_float(Re);
+                    matrix[index].Re = (*copy).Re;
                     matrix[index].Im = NULL;
-                    matrix[index].print = float_print;
-                    matrix[index].summ = float_summ;
-                    matrix[index].multiply = float_multiply;
-                    matrix[index].scalar_multiply = float_scalar_multiply;
-                    *(float*)matrix[index].Re = Re;
+                    matrix[index].print = (*copy).print;
+                    matrix[index].summ = (*copy).summ;
+                    matrix[index].multiply = (*copy).multiply;
+                    matrix[index].scalar_multiply = (*copy).scalar_multiply;
+                    free(copy);
                 }
             }
         }
     }
-    // printf("\nИтоговая матрица : ");
     return matrix;
 }
 
+
 //------------------------------------------------
+
+Complex_number* matrix_add_operation(Complex_number* matrix1, Complex_number* matrix2, int rank_matrix){
+    Complex_number *result = malloc(rank_matrix * rank_matrix * sizeof(Complex_number));
+    if(result == NULL){
+        return NULL;
+    }
+    for (int i = 0; i < rank_matrix * rank_matrix; i++){
+        Complex_number *copy = matrix1[i].summ(&matrix1[i], &matrix2[i]);
+
+        result[i].Re = malloc(sizeof(float));
+        if(result[i].Re == NULL){
+            return NULL;
+        }
+        *(float*)result[i].Re = *(float*)(*copy).Re;
+
+        if((*copy).Im != NULL){
+            result[i].Im = malloc(sizeof(float));
+            if(result[i].Im == NULL){
+                return NULL;
+            }
+            *(float*)result[i].Im = *(float*)(*copy).Im;
+        } 
+        else{
+            result[i].Im = NULL;
+        }
+        result[i].print = matrix1[i].print;
+        result[i].summ = matrix1[i].summ;
+        result[i].multiply = matrix1[i].multiply;
+        result[i].scalar_multiply = matrix1[i].scalar_multiply;
+
+        if ((*copy).Im != NULL){
+            free((*copy).Im);
+        }
+        free((*copy).Re);
+        free(copy);
+    }
+    return result;
+}
+
+Complex_number* matrix_multiply_operation(Complex_number* matrix1, Complex_number* matrix2, int rank_matrix){
+    Complex_number *result = malloc(rank_matrix * rank_matrix * sizeof(Complex_number));
+    if(result == NULL){
+        return NULL;
+    }
+    for(int i = 0; i < rank_matrix; i++){
+        for(int j = 0; j < rank_matrix; j++){
+            int index = i * rank_matrix + j;
+
+            int k = 0;
+            int indexA = i * rank_matrix + k;
+            int indexB = k * rank_matrix + j;
+            Complex_number *copy = matrix1[indexA].multiply(matrix1 + indexA, &matrix2[indexB]);
+
+            result[index].Re = malloc(sizeof(float));
+            if(result[index].Re == NULL){
+                return NULL;
+            }
+            *(float*)result[index].Re = *(float*)(*copy).Re;
+
+            if((*copy).Im != NULL){
+                result[index].Im = malloc(sizeof(float));
+                if(result[index].Im == NULL){
+                    return NULL;
+                }
+                *(float*)result[index].Im = *(float*)(*copy).Im;
+            }
+            else{
+                result[index].Im = NULL;
+            }
+
+            result[index].print = matrix1[indexA].print;
+            result[index].summ = matrix1[indexA].summ;
+            result[index].multiply = matrix1[indexA].multiply;
+            result[index].scalar_multiply = matrix1[indexA].scalar_multiply;
+
+            if((*copy).Im != NULL){
+                free((*copy).Im);
+            }
+            free((*copy).Re);
+            free(copy);
+            for(k = 1; k < rank_matrix; k++){
+                indexA = i * rank_matrix + k;
+                indexB = k * rank_matrix + j;
+                copy = matrix1[indexA].multiply(&matrix1[indexA], &matrix2[indexB]);
+
+                Complex_number *sum = result[index].summ(&result[index], copy);
+
+                if(result[index].Im != NULL){
+                    free(result[index].Im);
+                }
+                free(result[index].Re);
+
+                result[index].Re = malloc(sizeof(float));
+                if(result[index].Re == NULL){
+                    return NULL;
+                }
+                *(float*)result[index].Re = *(float*)(*sum).Re;
+
+                if((*sum).Im != NULL){
+                    result[index].Im = malloc(sizeof(float));
+                    if(result[index].Im == NULL){
+                        return NULL;
+                    }
+                    *(float*)result[index].Im = *(float*)(*sum).Im;
+                }
+                else{
+                    result[index].Im = NULL;
+                }
+
+                if((*sum).Im != NULL){
+                    free((*sum).Im);
+                }
+                free((*sum).Re);
+                free(sum);
+                
+                if((*copy).Im != NULL){
+                    free((*copy).Im);
+                }
+                free((*copy).Re);
+                free(copy);
+            }
+        }
+    }
+    return result;
+}
+
+Complex_number* matrix_scalar_multiply(Complex_number* matrix, float scalar, int rank_matrix){
+    Complex_number *result = malloc(rank_matrix * rank_matrix * sizeof(Complex_number));
+    if(result == NULL){
+        return NULL;
+    }
+    for(int i = 0; i < rank_matrix * rank_matrix; i++){
+        result[i].Re = malloc(sizeof(float));
+        if(result[i].Re == NULL){
+            return NULL;
+        }
+        *(float*)result[i].Re = *(float*)matrix[i].Re * scalar;
+        
+        if(matrix[i].Im != NULL){
+            result[i].Im = malloc(sizeof(float));
+            if(result[i].Im == NULL){
+                return NULL;
+            }
+            *(float*)result[i].Im = *(float*)matrix[i].Im * scalar;
+        }
+        else{
+            result[i].Im = NULL;
+        }
+        
+        result[i].print = matrix[i].print;
+        result[i].summ = matrix[i].summ;
+        result[i].multiply = matrix[i].multiply;
+        result[i].scalar_multiply = matrix[i].scalar_multiply;
+    }
+    return result;
+}
 
 int input_data(){
     srand(time(NULL));
@@ -399,11 +551,17 @@ int input_data(){
             while ((char_buffer = getchar()) != '\n' && char_buffer != EOF);
         }
     }
+
     if(question_start[0] != 'k'){
+
         Complex_number *matrix1, *matrix2, *result;
         printf("Для начала введите общий ранг матриц от 1 до %d : ", max_rank_of_matrix);
         rank_matrix = input_number(1, max_rank_of_matrix);
         result = malloc(rank_matrix * rank_matrix * sizeof(Complex_number));
+        if(result == NULL){
+            return 1;
+        }
+
         question_of_type = question("Введите < y > если вводить вещественные числа в матрицу или < n > если вводить комплексные : ");
         printf("\n--Заполните матрицу №1--\n");
         draw_matrix(0, 0, rank_matrix, epsilon_num);
@@ -412,111 +570,27 @@ int input_data(){
         matrix2 = create_matrix(rank_matrix, epsilon_num, question_of_type);
 
         if (question_start[0] == 's'){
-            for (int i = 0; i < rank_matrix * rank_matrix; i++){
-                Complex_number *copy = matrix1[i].summ(&matrix1[i], &matrix2[i]);
 
-                result[i].Re = malloc(sizeof(float));
-                *(float*)result[i].Re = *(float*)(*copy).Re;
-
-                if((*copy).Im != NULL){
-                    result[i].Im = malloc(sizeof(float));
-                    *(float*)result[i].Im = *(float*)(*copy).Im;
-                } 
-                else{
-                    result[i].Im = NULL;
-                }
-                result[i].print = matrix1[i].print;
-                result[i].summ = matrix1[i].summ;
-                result[i].multiply = matrix1[i].multiply;
-                result[i].scalar_multiply = matrix1[i].scalar_multiply;
-
-                if ((*copy).Im != NULL){
-                    free((*copy).Im);
-                }
-                free((*copy).Re);
-                free(copy);
-            }
-
+            result = matrix_add_operation(matrix1, matrix2, rank_matrix);
             draw_matrix(1, matrix1, rank_matrix, epsilon_num);
             printf("\n  +");
             draw_matrix(1, matrix2, rank_matrix, epsilon_num);
             printf("\n ||");
             draw_matrix(1, result, rank_matrix, epsilon_num);
+
         }
-        
+
         else{
-            for(int i = 0; i < rank_matrix; i++){
-                for(int j = 0; j < rank_matrix; j++){
-                    int index = i * rank_matrix + j;
-
-                    int k = 0;
-                    int indexA = i * rank_matrix + k;
-                    int indexB = k * rank_matrix + j;
-                    Complex_number *copy = matrix1[indexA].multiply(matrix1 + indexA, &matrix2[indexB]);
-
-                    result[index].Re = malloc(sizeof(float));
-                    *(float*)result[index].Re = *(float*)(*copy).Re;
-                    if((*copy).Im != NULL){
-                        result[index].Im = malloc(sizeof(float));
-                        *(float*)result[index].Im = *(float*)(*copy).Im;
-                    }
-                    else{
-                        result[index].Im = NULL;
-                    }
-                    result[index].print = matrix1[indexA].print;
-                    result[index].summ = matrix1[indexA].summ;
-                    result[index].multiply = matrix1[indexA].multiply;
-                    result[index].scalar_multiply = matrix1[indexA].scalar_multiply;
-
-                    if((*copy).Im != NULL){
-                        free((*copy).Im);
-                    }
-                    free((*copy).Re);
-                    free(copy);
-                    for(k = 1; k < rank_matrix; k++){
-                        indexA = i * rank_matrix + k;
-                        indexB = k * rank_matrix + j;
-                        copy = matrix1[indexA].multiply(&matrix1[indexA], &matrix2[indexB]);
-
-                        Complex_number *sum = result[index].summ(&result[index], copy);
-
-                        if(result[index].Im != NULL){
-                            free(result[index].Im);
-                        }
-                        free(result[index].Re);
-
-                        result[index].Re = malloc(sizeof(float));
-                        *(float*)result[index].Re = *(float*)(*sum).Re;
-                        if((*sum).Im != NULL){
-                            result[index].Im = malloc(sizeof(float));
-                            *(float*)result[index].Im = *(float*)(*sum).Im;
-                        }
-                        else{
-                            result[index].Im = NULL;
-                        }
-
-                        if((*sum).Im != NULL){
-                            free((*sum).Im);
-                        }
-                        free((*sum).Re);
-                        free(sum);
-                        
-                        if((*copy).Im != NULL) free((*copy).Im);
-                        free((*copy).Re);
-                        free(copy);
-                    }
-                }
-            }
-
+            result = matrix_multiply_operation(matrix1, matrix2, rank_matrix);
             draw_matrix(1, matrix1, rank_matrix, epsilon_num);
             printf("\n  *");
             draw_matrix(1, matrix2, rank_matrix, epsilon_num);
             printf("\n ||");
             draw_matrix(1, result, rank_matrix, epsilon_num);
         }
-    }
+    } 
     else{
-        Complex_number* matrix;
+        Complex_number* matrix, *result;
         printf("Для начала введите ранг матрицы от 1 до %d : ", max_rank_of_matrix);
         rank_matrix = input_number(1, max_rank_of_matrix);
         question_of_type = question("Введите < y > если вводить вещественные числа в матрицу или < n > если вводить комплексные : ");
@@ -528,10 +602,8 @@ int input_data(){
         draw_matrix(1, matrix, rank_matrix, epsilon_num);
         printf("\n  *\n\n  %.2f\n\n  ||", scalar);
 
-        for(int i = 0; i < rank_matrix * rank_matrix; i++){
-            matrix[i].scalar_multiply(scalar, matrix+i);
-        }
-        draw_matrix(1, matrix, rank_matrix, epsilon_num);
+        result = matrix_scalar_multiply(matrix, scalar, rank_matrix);
+        draw_matrix(1, result, rank_matrix, epsilon_num);
     }
+    return 0;
 }
-
