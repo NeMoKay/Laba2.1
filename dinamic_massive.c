@@ -15,9 +15,6 @@ Complex_number *gen_massive(){
 Complex_number *add_forward(Complex_number *first_address, int *len_massive){
     Complex_number *debug;
     debug = realloc(first_address, (*len_massive+1) * sizeof(Complex_number));
-    if(debug == NULL){
-        return NULL;
-    }
     int new_index = *len_massive;
     debug[new_index].Re = NULL;
     debug[new_index].Im = NULL;

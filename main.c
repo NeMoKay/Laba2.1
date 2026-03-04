@@ -4,6 +4,7 @@
 
 
 int main(){
+
     int memorry_checker = 0, test_chacker = 0;
     
     memorry_checker = input_data();
@@ -14,15 +15,13 @@ int main(){
         printf("\nОшибка памяти");
     }
 
-    
-    // test_chacker = test_all_func();
-    //  if(test_chacker == 0){
-    //     printf("\nВсе функции программы работают идеально");
-    // }
-    // else{
-    //     printf("\nОшибка функции");
-    // }
+    test_chacker = test_all_func();
+     if(test_chacker == 0){
+        printf("\n\nВсе функции программы работают идеально!\n");
+    }
+    else{
+        printf("\n\nОшибка функции. Выявленно %d ошибок!\n", test_chacker);
+    }
 
-    
     
 }

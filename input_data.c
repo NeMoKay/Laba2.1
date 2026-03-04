@@ -5,7 +5,6 @@
 #include "input_data.h"
 #include "dinamic_massive.h"
 
-
 char* float_print(const void* Stuct_Re1, int epsilon_num){
     const Complex_number *number = (const Complex_number*)Stuct_Re1;
     float num = *(const float*)(*number).Re;
@@ -68,7 +67,7 @@ void float_scalar_multiply(float scalar, void* Struct_Re1){
 
 }
 
-char* Complex_print(const void* Comlex1, int epsilon_num) {
+char* Complex_print(const void* Comlex1, int epsilon_num){
     const Complex_number* number = (const Complex_number*)Comlex1;
     float num_Re = *(const float*)(*number).Re;
     float num_Im = *(const float*)(*number).Im;
@@ -222,14 +221,10 @@ int question(char* question){
 }
 
 void draw_matrix(int tipe_matrix, Complex_number* matrix, int rank_matrix, int epsilon_num){
-
     char *result_print;
-
-    printf("\n");
     if(tipe_matrix == 0){
-        printf("Шаблон заполнения матрицы : \n");
+        printf("\nШаблон заполнения матрицы : \n\n| ");
         for(int i = 0; i < rank_matrix; i++){
-            printf("\n| ");
             for(int k = 0; k < rank_matrix; k++){
                 printf("a%d%d ", i+1, k+1);
             }
@@ -237,9 +232,10 @@ void draw_matrix(int tipe_matrix, Complex_number* matrix, int rank_matrix, int e
         }   
     }
     else{
+        printf("\n");
         for (int i = 0; i < rank_matrix; i++) {
             printf("\n|");
-            for (int k = 0; k < rank_matrix; k++) {
+            for(int k = 0; k < rank_matrix; k++){
                 int index = i * rank_matrix + k;
                 result_print = matrix[index].print(&matrix[index], epsilon_num);
                 printf("%s ", result_print);
@@ -257,10 +253,11 @@ float input_number(float min_side, float max_side){
         printf("Oшибка! Введите число от %.5g до %.5g : ", min_side, max_side);
         while ((char_buffer = getchar()) != '\n' && char_buffer != EOF);
     }
-    
     num = ((int)(num*1000)) / 1000.0;
     return num;
 }
+
+//------------------------------------------------
 
 Complex_number* create_matrix(int rank_matrix, int epsilon_num, int question_of_type){  
     
