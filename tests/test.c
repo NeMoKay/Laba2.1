@@ -3,11 +3,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-
 #include "test.h"
 #include "input_data.h"
 #include "dinamic_massive.h"
-
 
 
 int test_print_float(){

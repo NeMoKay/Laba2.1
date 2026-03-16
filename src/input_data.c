@@ -223,8 +223,9 @@ int question(char* question){
 void draw_matrix(int tipe_matrix, Complex_number* matrix, int rank_matrix, int epsilon_num){
     char *result_print;
     if(tipe_matrix == 0){
-        printf("\nШаблон заполнения матрицы : \n\n| ");
+        printf("\nШаблон заполнения матрицы : \n");
         for(int i = 0; i < rank_matrix; i++){
+            printf("\n|");
             for(int k = 0; k < rank_matrix; k++){
                 printf("a%d%d ", i+1, k+1);
             }
@@ -438,6 +439,7 @@ Complex_number* matrix_multiply(Complex_number* matrix1, Complex_number* matrix2
             }
             free((*copy).Re);
             free(copy);
+            
             for(k = 1; k < rank_matrix; k++){
                 indexA = i * rank_matrix + k;
                 indexB = k * rank_matrix + j;
@@ -602,3 +604,4 @@ int input_data(){
     }
     return 0;
 }
+

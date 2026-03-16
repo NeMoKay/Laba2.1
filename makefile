@@ -1,10 +1,9 @@
 CC = gcc-15
-SOURCES = main.c input_data.c dinamic_massive.c test.c
+SOURCES = src/main.c src/input_data.c src/dinamic_massive.c tests/test.c
 TARGET = main
 all: $(TARGET)
 $(TARGET): $(SOURCES)
-	$(CC) $^ -o $@
-
+	$(CC) $^ -o $@ -Iinclude
 clean:
 	rm -f $(TARGET)
 

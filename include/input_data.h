@@ -38,8 +38,6 @@ void draw_matrix(int tipe_matrix, Complex_number* matrix, int rank_matrix, int e
 
 
 
-
-
 // typedef struct{
 //     void (*print)(const void*, int);
 //     void* (*summ)(const void*, const void*);
@@ -60,15 +58,7 @@ void draw_matrix(int tipe_matrix, Complex_number* matrix, int rank_matrix, int e
 //     void* Im;
 //     void* float_ili_int_govno
 // }Complex_number;
-
-
-
-
-
-
-
-
-
+//Спасите меня я не хочу сдавать
 
 
 #endif
