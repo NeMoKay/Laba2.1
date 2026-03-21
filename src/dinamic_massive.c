@@ -1,23 +1,112 @@
-
-#include "input_data.h"
-#include <stdio.h>
+#include "Matrix.h"
+#include "dinamic_massive.h"
 #include <stdlib.h>
 
-Complex_number *gen_massive(){
-    Complex_number *first = malloc(sizeof(Complex_number));
-
-    if (first == NULL){
+void* add_forward_float(Matrix* matrix){
+    number* arr = (*matrix).Matrix;
+    int len = (*matrix).len_matrix;
+    number* new_address = realloc(arr, (len + 1) * sizeof(number));
+    if (new_address == NULL){
         return NULL;
     }
-    return first;
+    int index = len;
+    new_address[index].type_num = NULL;
+    new_address[index].type_info = &float_typeinfo;
+
+    (*matrix).len_matrix++;
+    (*matrix).Matrix = new_address;
+    return new_address;
 }
 
-Complex_number *add_forward(Complex_number *first_address, int *len_massive){
-    Complex_number *debug;
-    debug = realloc(first_address, (*len_massive+1) * sizeof(Complex_number));
-    int new_index = *len_massive;
-    debug[new_index].Re = NULL;
-    debug[new_index].Im = NULL;
-    (*len_massive)++;
-    return debug;
+void* add_forward_complex(Matrix* matrix){
+    number* arr = (*matrix).Matrix;
+    int len = (*matrix).len_matrix;
+    number* new_address = realloc(arr, (len + 1) * sizeof(number));
+    if (new_address == NULL) return NULL;
+
+    int index = len;
+    new_address[index].type_num = NULL;
+    new_address[index].type_info = &complex_typeinfo;
+
+    (*matrix).len_matrix++;
+    (*matrix).Matrix = new_address;
+    return new_address;
 }
+
+TypeInfo_Matrix float_array_typeinfo ={
+    .add_forward = add_forward_float
+};
+
+TypeInfo_Matrix complex_array_typeinfo ={
+    .add_forward = add_forward_complex
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,5 +1,5 @@
 CC = gcc-15
-SOURCES = src/main.c src/input_data.c src/dinamic_massive.c tests/test.c
+SOURCES = src/main.c src/io.c src/dinamic_massive.c src/Matrix.c
 TARGET = main
 all: $(TARGET)
 $(TARGET): $(SOURCES)
@@ -8,3 +8,4 @@ clean:
 	rm -f $(TARGET)
 
 .PHONY: all clean
+

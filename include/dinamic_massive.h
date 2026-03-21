@@ -1,10 +1,21 @@
 #ifndef DINAMIC_MASSIVE_H
 #define DINAMIC_MASSIVE_H
 
-#include "input_data.h"
+typedef struct Matrix Matrix;
+typedef struct number number;
 
+typedef struct TypeInfo_Matrix{
+    void* (*add_forward)(Matrix* matrix);
+} TypeInfo_Matrix;
 
-Complex_number *gen_massive();
-Complex_number *add_forward(Complex_number *first_address, int *len_massive);
+struct Matrix{
+    number* Matrix;
+    int rank_of_matrix;
+    int len_matrix;
+    TypeInfo_Matrix* typeinfo;
+};
+
+extern TypeInfo_Matrix float_array_typeinfo;
+extern TypeInfo_Matrix complex_array_typeinfo;
 
 #endif

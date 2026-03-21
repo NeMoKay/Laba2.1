@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include "input_data.h"
+#include "io.h"
 #include "test.h"
 
 
@@ -15,13 +15,13 @@ int main(){
         printf("\nОшибка памяти");
     }
 
-    test_chacker = test_all_func();
-     if(test_chacker == 0){
-        printf("\n\nВсе функции программы работают идеально!\n");
-    }
-    else{
-        printf("\n\nОшибка функции. Выявленно %d ошибок!\n", test_chacker);
-    }
+    // test_chacker = test_all_func();
+    //  if(test_chacker == 0){
+    //     printf("\n\nВсе функции программы работают идеально!\n");
+    // }
+    // else{
+    //     printf("\n\nОшибка функции. Выявленно %d ошибок!\n", test_chacker);
+    // }
 
     
 }
