@@ -8,6 +8,10 @@
 #include <stdlib.h>
 #include <string.h>
 
+char* number_print(const number* num, int epsilon_num){
+    return (*((*num).type_info)).print((*num).type_num, epsilon_num);
+}
+
 char* float_print(const void* data, int epsilon_num){
     float num = *(const float*)data;
     int int_part = (int)num;
@@ -190,6 +194,21 @@ void Complex_scalar_multiply(float scalar, void* data){
     *(int*)(*num).Im = (int)(scalar * (*(int*)(*num).Im));
 }
 
+number *get_elem(Matrix *Matrix_info, int index){
+    if  (index >= (*Matrix_info).len_matrix || index < 0){
+        return NULL;
+    }
+    return (*Matrix_info).Matrix + index;
+}
+
+void set_elem(Matrix *Matrix_info, int index, number *elem){
+    number *now_data = get_elem(Matrix_info, index);
+    if (now_data == NULL){
+        return;
+    }
+    *now_data = *elem;
+}
+
 number* create_float(float Real){
     number* num = malloc(sizeof(number));
     if (num == NULL){
@@ -366,8 +385,8 @@ Matrix* matrix_summ(Matrix* matrix1, Matrix* matrix2){
         return NULL;
     }
 
-    number* res_data = malloc(rank_of_matrix * rank_of_matrix * sizeof(number));
-    if (res_data == NULL){
+    number* result_data = malloc(rank_of_matrix * rank_of_matrix * sizeof(number));
+    if (result_data == NULL){
         free(result);
         return NULL;
     }
@@ -380,17 +399,17 @@ Matrix* matrix_summ(Matrix* matrix1, Matrix* matrix2){
         void* sum = (*info).summ(m1[i].type_num, m2[i].type_num);
         if (sum == NULL){
             for (int j = 0; j < i; j++){
-                free(res_data[j].type_num);
+                free(result_data[j].type_num);
             }
-            free(res_data);
+            free(result_data);
             free(result);
             return NULL;
         }
-        res_data[i].type_num = sum;
-        res_data[i].type_info = info;
+        result_data[i].type_num = sum;
+        result_data[i].type_info = info;
     }
 
-    (*result).Matrix = res_data;
+    (*result).Matrix = result_data;
     (*result).rank_of_matrix = rank_of_matrix;
     (*result).len_matrix = rank_of_matrix * rank_of_matrix;
     (*result).typeinfo = (*matrix1).typeinfo;
@@ -399,6 +418,7 @@ Matrix* matrix_summ(Matrix* matrix1, Matrix* matrix2){
 }
 
 Matrix* matrix_multiply(Matrix* matrix1, Matrix* matrix2){
+
     if (matrix1 == NULL || matrix2 == NULL){
         return NULL;
     }
@@ -411,8 +431,8 @@ Matrix* matrix_multiply(Matrix* matrix1, Matrix* matrix2){
     Matrix* result = malloc(sizeof(Matrix));
     if (result == NULL) return NULL;
 
-    number* res_data = malloc(rank_of_matrix * rank_of_matrix * sizeof(number));
-    if (res_data == NULL){
+    number* result_data = malloc(rank_of_matrix * rank_of_matrix * sizeof(number));
+    if (result_data == NULL){
         free(result);
         return NULL;
     }
@@ -422,33 +442,47 @@ Matrix* matrix_multiply(Matrix* matrix1, Matrix* matrix2){
 
     for (int i = 0; i < rank_of_matrix; i++){
         for (int j = 0; j < rank_of_matrix; j++){
+
             int index = i * rank_of_matrix + j;
             void* sum_data = NULL;
             TypeInfo* info = m1[i*rank_of_matrix].type_info;
 
             for (int k = 0; k < rank_of_matrix; k++){
+
                 int indexA = i * rank_of_matrix + k;
                 int indexB = k * rank_of_matrix + j;
-                void* a = m1[indexA].type_num;
-                void* b = m2[indexB].type_num;
-                void* prod = (*info).multiply(a, b);
-                if (prod == NULL){
-                    if (sum_data != NULL) free(sum_data);
-                    for (int row = 0; row <= i; row++){
-                        int col_limit = (row == i) ? j : rank_of_matrix;
-                        for (int col = 0; col < col_limit; col++)
-                            free(res_data[row * rank_of_matrix + col].type_num);
+
+                void* result_multiply = (*info).multiply(m1[indexA].type_num, m2[indexB].type_num);
+
+                if (result_multiply == NULL){
+                    if (sum_data != NULL){
+                        free(sum_data); 
                     }
-                    free(res_data);
+                    for (int row = 0; row <= i; row++){
+                        int col_limit;
+                        if (row == i){
+                            col_limit = j;
+                        } 
+                        else{
+                            col_limit = rank_of_matrix;
+                        }
+                        for (int col = 0; col < col_limit; col++){
+                            free(result_data[row * rank_of_matrix + col].type_num);
+                        }  
+                    }
+                    free(result_data);
                     free(result);
                     return NULL;
                 }
+
                 if (k == 0){
-                    sum_data = prod;
-                } else{
-                    void* new_sum = (*info).summ(sum_data, prod);
+                    sum_data = result_multiply;
+                } 
+
+                else{
+                    void* new_sum = (*info).summ(sum_data, result_multiply);
                     free(sum_data);
-                    free(prod);
+                    free(result_multiply);
                     if (new_sum == NULL){
                         for (int row = 0; row <= i; row++){
                             int col_limit;
@@ -458,22 +492,24 @@ Matrix* matrix_multiply(Matrix* matrix1, Matrix* matrix2){
                             else{
                                 col_limit = rank_of_matrix;
                             }
-                            for (int col = 0; col < col_limit; col++)
-                                free(res_data[row * rank_of_matrix + col].type_num);
+                            for (int col = 0; col < col_limit; col++){
+                                free(result_data[row * rank_of_matrix + col].type_num);
+                            }
                         }
-                        free(res_data);
+                        free(result_data);
                         free(result);
                         return NULL;
                     }
                     sum_data = new_sum;
                 }
             }
-            res_data[index].type_num = sum_data;
-            res_data[index].type_info = info;
+
+            result_data[index].type_num = sum_data;
+            result_data[index].type_info = info;
         }
     }
 
-    (*result).Matrix = res_data;
+    (*result).Matrix = result_data;
     (*result).rank_of_matrix = rank_of_matrix;
     (*result).len_matrix = rank_of_matrix * rank_of_matrix;
     (*result).typeinfo = (*matrix1).typeinfo;
@@ -482,81 +518,85 @@ Matrix* matrix_multiply(Matrix* matrix1, Matrix* matrix2){
 }
 
 Matrix* matrix_scalar_multiply(Matrix* matrix, float scalar){
-    if (matrix == NULL) return NULL;
-
-    int rank = (*matrix).rank_of_matrix;
-    int total = rank * rank;
+    if (matrix == NULL){
+        return NULL;
+    }
+    int rank_of_matrix = (*matrix).rank_of_matrix;
 
     Matrix* result = malloc(sizeof(Matrix));
     if (result == NULL) return NULL;
 
-    number* res_data = malloc(total * sizeof(number));
-    if (res_data == NULL){
+    number* result_data = malloc(rank_of_matrix * rank_of_matrix * sizeof(number));
+    if (result_data == NULL){
         free(result);
         return NULL;
     }
 
-    number* src = (*matrix).Matrix;
+    number* main_matrix = (*matrix).Matrix;
 
-    for (int i = 0; i < total; i++){
-        TypeInfo* info = src[i].type_info;
-        void* src_data = src[i].type_num;
-        void* dst = NULL;
+    for (int i = 0; i < rank_of_matrix * rank_of_matrix; i++){
+        TypeInfo* info = main_matrix[i].type_info;
+        void* main_matrix_data = main_matrix[i].type_num;
+        void* new_elem = NULL;
 
         if (info == &float_typeinfo){
-            float* fdst = malloc(sizeof(float));
-            if (fdst == NULL){
-                for (int j = 0; j < i; j++) free(res_data[j].type_num);
-                free(res_data);
+            float* float_new_elem = malloc(sizeof(float));
+            if (float_new_elem == NULL){
+                for (int j = 0; j < i; j++) free(result_data[j].type_num);
+                free(result_data);
                 free(result);
                 return NULL;
             }
-            *fdst = *(float*)src_data;
-            dst = fdst;
-        } else if (info == &complex_typeinfo){
-            Complex_number* csrc = (Complex_number*)src_data;
-            Complex_number* cdst = malloc(sizeof(Complex_number));
-            if (cdst == NULL){
-                for (int j = 0; j < i; j++){
-                    free(res_data[j].type_num);
-                }
-                free(res_data);
-                free(result);
-                return NULL;
-            }
-            (*cdst).Re = malloc(sizeof(int));
-            (*cdst).Im = malloc(sizeof(int));
-            if ((*cdst).Re == NULL || (*cdst).Im == NULL){
-                free((*cdst).Re);
-                free((*cdst).Im);
-                free(cdst);
-                for (int j = 0; j < i; j++) free(res_data[j].type_num);
-                free(res_data);
-                free(result);
-                return NULL;
-            }
-            *(*cdst).Re = *(*cdst).Re;
-            *(*cdst).Im = *(*cdst).Im;
-            dst = cdst;
-        } 
-        else{
-            for (int j = 0; j < i; j++){
-                free(res_data[j].type_num);
-            }
-            free(res_data);
-            free(result);
-            return NULL;
+            *float_new_elem = *(float*)main_matrix_data;
+            new_elem = float_new_elem;
         }
+        else{
+            if (info == &complex_typeinfo){
+                Complex_number* copy_main_matrix = (Complex_number*)main_matrix_data;
+                Complex_number* copy_new_elem = malloc(sizeof(Complex_number));
+                if (copy_new_elem == NULL){
+                    for (int j = 0; j < i; j++){
+                        free(result_data[j].type_num);
+                    }
+                    free(result_data);
+                    free(result);
+                    return NULL;
+                }
+                (*copy_new_elem).Re = malloc(sizeof(int));
+                (*copy_new_elem).Im = malloc(sizeof(int));
+                if ((*copy_new_elem).Re == NULL || (*copy_new_elem).Im == NULL){
+                    free((*copy_new_elem).Re);
+                    free((*copy_new_elem).Im);
+                    free(copy_new_elem);
+                    for (int j = 0; j < i; j++) free(result_data[j].type_num);
+                    free(result_data);
+                    free(result);
+                    return NULL;
+                }
 
-        (*info).scalar_multiply(scalar, dst);
+                *(*copy_new_elem).Re = *(*copy_main_matrix).Re;
+                *(*copy_new_elem).Im = *(*copy_main_matrix).Im;
+                new_elem = copy_new_elem;
+            } 
+            else{
+                for (int j = 0; j < i; j++){
+                    free(result_data[j].type_num);
+                }
+                free(result_data);
+                free(result);
+                return NULL;
+            }
+        }
+        
 
-        res_data[i].type_num = dst;
-        res_data[i].type_info = info;
+        (*info).scalar_multiply(scalar, new_elem);
+        result_data[i].type_num = new_elem;
+        result_data[i].type_info = info;
     }
 
-    (*result).Matrix = res_data;
-    (*result).rank_of_matrix = rank;
-    (*result).len_matrix = total;
+    (*result).Matrix = result_data;
+    (*result).rank_of_matrix = rank_of_matrix;
+    (*result).len_matrix = rank_of_matrix * rank_of_matrix;
     (*result).typeinfo = (*matrix).typeinfo;
 
     return result;
@@ -579,7 +619,7 @@ void draw_matrix(int type_matrix, number* matrix, int rank_matrix, int epsilon_n
             printf("\n|");
             for (int k = 0; k < rank_matrix; k++){
                 int index = i * rank_matrix + k;
-                char* str = (*((*(matrix + index)).type_info )).print((*(matrix + index)).type_num, epsilon_num);
+                char* str = number_print(&matrix[index], epsilon_num);
                 if (str){
                     printf("%s ", str);
                     free(str);
@@ -594,21 +634,6 @@ void draw_matrix(int type_matrix, number* matrix, int rank_matrix, int epsilon_n
     printf("\n");
 }
 
-number *get_elem(Matrix *Matrix_info, int index){
-    if  (index >= (*Matrix_info).len_matrix || index < 0){
-        return NULL;
-    }
-    return (*Matrix_info).Matrix + index;
-}
-
-void set_elem(Matrix *Matrix_info, int index, number *elem){
-    number *now_data = get_elem(Matrix_info, index);
-    if (now_data == NULL){
-        return;
-    }
-    *now_data = *elem;
-}
-
 TypeInfo float_typeinfo ={
     .print = float_print,
     .summ = float_summ,
@@ -617,6 +642,7 @@ TypeInfo float_typeinfo ={
 };
 
 TypeInfo complex_typeinfo ={
+
     .print = Complex_print,
     .summ = Complex_summ,
     .multiply = Complex_multiply,

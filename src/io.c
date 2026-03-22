@@ -46,7 +46,7 @@ float input_number(float min_side, float max_side, int type_num){
             printf("Oшибка! Введите число от %.2f до %.2f : ", min_side, max_side);
             while ((char_buffer = getchar()) != '\n' && char_buffer != EOF);
         }
-        return num;
+        return num; 
     }
     if(type_num == 1){
         while(scanf("%f", &num) != 1 || (num < min_side || num > max_side) || (int)num % 10 > (int)max_side % 10){
@@ -67,7 +67,7 @@ int input_data(){
 
     const int max_rank_of_matrix = 10, epsilon_num = 100;
 
-    int len_counter = 0, rank_matrix = 0, question_of_type, len_matrix = 0, question_of_change = 0;
+    int len_counter = 0, rank_matrix = 0, question_of_type, len_matrix = 0, question_of_change = 0, index = 0, qestion_stop = 0;
     char question_start[2], char_buffer;
     float scalar = 0.0;
 
@@ -93,6 +93,7 @@ int input_data(){
 
     if(question_start[0] != 'k'){
         question_of_change = 0;
+        qestion_stop = 0;
         Matrix *matrix1, *matrix2, *result;
         printf("Для начала введите общий ранг матриц от 1 до %d : ", max_rank_of_matrix);
         rank_matrix = input_number(1, max_rank_of_matrix, 0);
@@ -104,28 +105,101 @@ int input_data(){
         draw_matrix(1, (*matrix1).Matrix, (*matrix1).rank_of_matrix, epsilon_num);
         printf("\nЖелаете изменить матрицу?\n");
         question_of_change = question("Введите < y > если хотите изменить числа в матрице или < n > если нет : ");
-        if(question_of_type == 1){
-            int index = 0;
-            printf("\nВведите индекс матрицы : a");
-            index = input_number(11, rank_matrix * 11, 1);
-            printf("\nИзмненение значения элемента по индексу а%d :", index);
-            
-              
+        if(question_of_change == 1){
+            if(question_of_type == 1){
+                while(1){
+                    float new_num_Re = 0.0;
+                    index = 0;
+                    printf("\nВведите индекс матрицы : a");
+                    index = input_number(11, rank_matrix * 11, 1);
+                    printf("\nВведите вещесвтенное число [%d ; %d]: ", -epsilon_num, epsilon_num);
+                    new_num_Re = input_number(-epsilon_num, epsilon_num, 0);
+                    *(float*)((*matrix1).Matrix[index].type_num) = new_num_Re;
+                    printf("\nИзмененная матрица :");
+                    draw_matrix(1, (*matrix1).Matrix, (*matrix1).rank_of_matrix, epsilon_num);
+                    qestion_stop = question("\nОстановить изменение матрицы? y/n : ");
+                    if (qestion_stop == 1){
+                        break;
+                    }
+                } 
+            }
+            else{
+                while(1){
+                    int new_num_Re = 0, new_num_Im = 0;
+                    index = 0;
+                    printf("\nВведите индекс матрицы : a");
+                    index = input_number(11, rank_matrix * 11, 1);
+                    printf("\nВведите целую часть комлексного числа [%d ; %d]: ", -epsilon_num, epsilon_num);
+                    new_num_Re = input_number(-epsilon_num, epsilon_num, 0);
+                    printf("\nВведите мнимую часть комлексного числа [%d ; %d]: ", -epsilon_num, epsilon_num);
+                    new_num_Im = input_number(-epsilon_num, epsilon_num, 0);
+
+
+                    Complex_number *copy = (Complex_number*)((*matrix1).Matrix[index].type_num);
+                    *((*copy).Re) = (int)new_num_Re;
+                    *((*copy).Im) = (int)new_num_Im;
+
+                    printf("\nИзмененная матрица :");
+                    draw_matrix(1, (*matrix1).Matrix, (*matrix1).rank_of_matrix, epsilon_num);
+                    qestion_stop = question("\nОстановить изменение матрицы? y/n : ");
+                    if (qestion_stop == 1){
+                        break;
+                    }
+                } 
+            }
             
         }
+        
 
         question_of_change = 0;
+        qestion_stop = 0;
         printf("\n--Заполните матрицу №2--\n");
         draw_matrix(0, NULL, rank_matrix, epsilon_num);
         matrix2 = create_matrix(rank_matrix, epsilon_num, question_of_type);
-        draw_matrix(1, (*matrix1).Matrix, (*matrix1).rank_of_matrix, epsilon_num);
+        draw_matrix(1, (*matrix2).Matrix, (*matrix2).rank_of_matrix, epsilon_num);
         printf("\nЖелаете изменить матрицу?\n");
         question_of_change = question("Введите < y > если хотите изменить числа в матрице или < n > если нет : ");
-        if(question_of_type == 1){
-            
-        }
-        question_of_change = 0;
+        if(question_of_change == 1){
+            if(question_of_type == 1){
+                while(1){
+                    float new_num_Re = 0.0;
+                    index = 0;
+                    printf("\nВведите индекс матрицы : a");
+                    index = input_number(11, rank_matrix * 11, 1);
+                    printf("\nВведите вещесвтенное число [%d ; %d]: ", -epsilon_num, epsilon_num);
+                    new_num_Re = input_number(-epsilon_num, epsilon_num, 0);
+                    *(float*)((*matrix2).Matrix[index].type_num) = new_num_Re;
+                    printf("\nИзмененная матрица :");
+                    draw_matrix(1, (*matrix2).Matrix, (*matrix2).rank_of_matrix, epsilon_num);
+                    qestion_stop = question("\nОстановить изменение матрицы? y/n : ");
+                    if (qestion_stop == 1){
+                        break;
+                    }
+                } 
+            }
+            else{
+                while(1){
+                    int new_num_Re = 0, new_num_Im = 0;
+                    index = 0;
+                    printf("\nВведите индекс матрицы : a");
+                    index = input_number(11, rank_matrix * 11, 1);
+                    printf("\nВведите целую часть комлексного числа [%d ; %d]: ", -epsilon_num, epsilon_num);
+                    new_num_Re = input_number(-epsilon_num, epsilon_num, 0);
+                    printf("\nВведите мнимую часть комлексного числа [%d ; %d]: ", -epsilon_num, epsilon_num);
+                    new_num_Im = input_number(-epsilon_num, epsilon_num, 0);
+                    Complex_number *copy = (Complex_number*)((*matrix2).Matrix[index].type_num);
+                    *((*copy).Re) = (int)new_num_Re;
+                    *((*copy).Im) = (int)new_num_Im;
 
+                    printf("\nИзмененная матрица :");
+                    draw_matrix(1, (*matrix2).Matrix, (*matrix2).rank_of_matrix, epsilon_num);
+                    qestion_stop = question("\nОстановить изменение матрицы? y/n : ");
+                    if (qestion_stop == 1){
+                        break;
+                    }
+                } 
+            }
+        }
         if (question_start[0] == 's'){
             result = matrix_summ(matrix1, matrix2);
             draw_matrix(1, (*matrix1).Matrix, (*matrix1).rank_of_matrix, epsilon_num);
@@ -153,9 +227,48 @@ int input_data(){
         draw_matrix(0, NULL, rank_matrix, epsilon_num);
         matrix = create_matrix(rank_matrix, epsilon_num, question_of_type);
         draw_matrix(1, (*matrix).Matrix, (*matrix).rank_of_matrix, epsilon_num);
-         printf("\nЖелаете изменить матрицу?\n");
+        printf("\nЖелаете изменить матрицу?\n");
         question_of_change = question("Введите < y > если хотите изменить числа в матрице или < n > если нет : ");
-        if(question_of_type == 1){
+        if(question_of_change == 1){
+            if(question_of_type == 1){
+                while(1){
+                    float new_num_Re = 0.0;
+                    index = 0;
+                    printf("\nВведите индекс матрицы : a");
+                    index = input_number(11, rank_matrix * 11, 1);
+                    printf("\nВведите вещесвтенное число [%d ; %d]: ", -epsilon_num, epsilon_num);
+                    new_num_Re = input_number(-epsilon_num, epsilon_num, 0);
+                    *(float*)((*matrix).Matrix[index].type_num) = new_num_Re;
+                    printf("\nИзмененная матрица :");
+                    draw_matrix(1, (*matrix).Matrix, (*matrix).rank_of_matrix, epsilon_num);
+                    qestion_stop = question("\nОстановить изменение матрицы? y/n : ");
+                    if (qestion_stop == 1){
+                        break;
+                    }
+                } 
+            }
+            else{
+                while(1){
+                    int new_num_Re = 0, new_num_Im = 0;
+                    index = 0;
+                    printf("\nВведите индекс матрицы : a");
+                    index = input_number(11, rank_matrix * 11, 1);
+                    printf("\nВведите целую часть комлексного числа [%d ; %d]: ", -epsilon_num, epsilon_num);
+                    new_num_Re = input_number(-epsilon_num, epsilon_num, 0);
+                    printf("\nВведите мнимую часть комлексного числа [%d ; %d]: ", -epsilon_num, epsilon_num);
+                    new_num_Im = input_number(-epsilon_num, epsilon_num, 0);
+                    Complex_number *copy = (Complex_number*)((*matrix).Matrix[index].type_num);
+                    *((*copy).Re) = (int)new_num_Re;
+                    *((*copy).Im) = (int)new_num_Im;
+
+                    printf("\nИзмененная матрица :");
+                    draw_matrix(1, (*matrix).Matrix, (*matrix).rank_of_matrix, epsilon_num);
+                    qestion_stop = question("\nОстановить изменение матрицы? y/n : ");
+                    if (qestion_stop == 1){
+                        break;
+                    }
+                } 
+            }
             
         }
         question_of_change = 0;

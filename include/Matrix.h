@@ -20,6 +20,7 @@ typedef struct number{
     TypeInfo* type_info;
 } number;
 
+char* number_print(const number* num, int epsilon_num);
 char* float_print(const void* data, int epsilon_num);
 void* float_summ(const void* a, const void* b);
 void* float_multiply(const void* a, const void* b);
