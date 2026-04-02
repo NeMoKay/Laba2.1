@@ -1,10 +1,8 @@
 #include <stdio.h>
 #include "io.h"
-#include "test.h"
 
 
 int main(){
-
     int memorry_checker = 0, test_chacker = 0;
     
     memorry_checker = input_data();
@@ -14,14 +12,6 @@ int main(){
     else{
         printf("\nОшибка памяти");
     }
-
-    // test_chacker = test_all_func();
-    //  if(test_chacker == 0){
-    //     printf("\n\nВсе функции программы работают идеально!\n");
-    // }
-    // else{
-    //     printf("\n\nОшибка функции. Выявленно %d ошибок!\n", test_chacker);
-    // }
-
+    return 0;
     
 }

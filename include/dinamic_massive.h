@@ -4,6 +4,7 @@
 typedef struct Matrix Matrix;
 typedef struct number number;
 
+
 typedef struct TypeInfo_Matrix{
     void* (*add_forward)(Matrix* matrix);
 } TypeInfo_Matrix;
@@ -13,9 +14,10 @@ struct Matrix{
     int rank_of_matrix;
     int len_matrix;
     TypeInfo_Matrix* typeinfo;
+
 };
 
-extern TypeInfo_Matrix float_array_typeinfo;
-extern TypeInfo_Matrix complex_array_typeinfo;
+extern TypeInfo_Matrix float_address_typeinfo;
+extern TypeInfo_Matrix complex_address_typeinfo;
 
 #endif

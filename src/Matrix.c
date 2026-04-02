@@ -3,6 +3,7 @@
 #include "io.h"
 #include "dinamic_massive.h"
 
+
 #include <stdio.h>
 #include <time.h>
 #include <stdlib.h>
@@ -69,9 +70,47 @@ void* float_multiply(const void* a, const void* b){
     return result;
 }
 
-void float_scalar_multiply(float scalar, void* data){
-    float* num = (float*)data;
-    *num = scalar * *num;
+void float_scalar_multiply(void *scalar, void* data, int type_scalar){
+
+    if (type_scalar == 1){ 
+        float* num = (float*)data;
+        float* scl = (float*)scalar;
+        *num = *scl * *num;
+    } 
+    else{
+
+        float old_float_val = *(float*)data;
+        free(data);
+
+        Complex_number* new_complex_data = malloc(sizeof(Complex_number));
+        if (new_complex_data == NULL){
+            return;
+        }
+        (*new_complex_data).Re = malloc(sizeof(int));
+        (*new_complex_data).Im = malloc(sizeof(int));
+        if ((*new_complex_data).Re == NULL || (*new_complex_data).Im == NULL){
+             free((*new_complex_data).Re);
+             free((*new_complex_data).Im);
+             free(new_complex_data);
+             return;
+        }
+        *((*new_complex_data).Re) = (int)old_float_val;
+        *((*new_complex_data).Im) = 0;
+
+        Complex_number* scalar_complex = (Complex_number*)scalar;
+
+        int Re1 = *((*new_complex_data).Re);
+        int Imatrix_1 = *((*new_complex_data).Im);
+        int Re2 = *((*scalar_complex).Re);
+        int Imatrix_2 = *((*scalar_complex).Im);
+
+        int New_Re = Re1 * Re2 - Imatrix_1 * Imatrix_2;
+        int New_Im = Re1 * Imatrix_2 + Imatrix_1 * Re2;
+
+        *((*new_complex_data).Re) = New_Re;
+        *((*new_complex_data).Im) = New_Im;
+    }
+    
 }
 
 char* Complex_print(const void* data, int epsilon_num){
@@ -136,8 +175,8 @@ char* Complex_print(const void* data, int epsilon_num){
 }
 
 void* Complex_summ(const void* a, const void* b){
-    const Complex_number* num1 = (const Complex_number*)a;
-    const Complex_number* num2 = (const Complex_number*)b;
+    const Complex_number* numatrix_1 = (const Complex_number*)a;
+    const Complex_number* numatrix_2 = (const Complex_number*)b;
 
     Complex_number* result = malloc(sizeof(Complex_number));
     if (result == NULL){
@@ -153,20 +192,20 @@ void* Complex_summ(const void* a, const void* b){
         return NULL;
     }
 
-    *(int*)(*result).Re = *(const int*)(*num1).Re + *(const int*)(*num2).Re;
-    *(int*)(*result).Im = *(const int*)(*num1).Im + *(const int*)(*num2).Im;
+    *(int*)(*result).Re = *(const int*)(*numatrix_1).Re + *(const int*)(*numatrix_2).Re;
+    *(int*)(*result).Im = *(const int*)(*numatrix_1).Im + *(const int*)(*numatrix_2).Im;
 
     return result;
 }
 
 void* Complex_multiply(const void* a, const void* b){
-    const Complex_number* num1 = (const Complex_number*)a;
-    const Complex_number* num2 = (const Complex_number*)b;
+    const Complex_number* numatrix_1 = (const Complex_number*)a;
+    const Complex_number* numatrix_2 = (const Complex_number*)b;
 
-    int re1 = *(const int*)(*num1).Re;
-    int im1 = *(const int*)(*num1).Im;
-    int re2 = *(const int*)(*num2).Re;
-    int im2 = *(const int*)(*num2).Im;
+    int Re1 = *(const int*)(*numatrix_1).Re;
+    int Imatrix_1 = *(const int*)(*numatrix_1).Im;
+    int Re2 = *(const int*)(*numatrix_2).Re;
+    int Imatrix_2 = *(const int*)(*numatrix_2).Im;
 
     Complex_number* result = malloc(sizeof(Complex_number));
     if (result == NULL){
@@ -182,16 +221,39 @@ void* Complex_multiply(const void* a, const void* b){
         return NULL;
     }
 
-    *(int*)(*result).Re = re1 * re2 - im1 * im2;
-    *(int*)(*result).Im = re1 * im2 + im1 * re2;
+    *(int*)(*result).Re = Re1 * Re2 - Imatrix_1 * Imatrix_2;
+    *(int*)(*result).Im = Re1 * Imatrix_2 + Imatrix_1 * Re2;
 
     return result;
 }
 
-void Complex_scalar_multiply(float scalar, void* data){
+void Complex_scalar_multiply(void *scalar, void* data, int type_scalar){
+
     Complex_number* num = (Complex_number*)data;
-    *(int*)(*num).Re = (int)(scalar * (*(int*)(*num).Re));
-    *(int*)(*num).Im = (int)(scalar * (*(int*)(*num).Im));
+
+    if (type_scalar == 1){
+        int Re1 = *((*num).Re);
+        int Imatrix_1 = *((*num).Im);
+        float* scalar_floatloat = (float*)scalar;
+        float scalar_float = *scalar_floatloat;
+
+        *((*num).Re) = (int)((float)Re1 * scalar_float);
+        *((*num).Im) = (int)((float)Imatrix_1 * scalar_float);
+    } 
+    else{
+        Complex_number *scalar_complex = (Complex_number*)scalar;
+
+        int Re1 = *((*num).Re);
+        int Imatrix_1 = *((*num).Im);
+        int Re2 = *((*scalar_complex).Re);
+        int Imatrix_2 = *((*scalar_complex).Im);
+
+        int New_Re = Re1 * Re2 - Imatrix_1 * Imatrix_2;
+        int New_Im = Re1 * Imatrix_2 + Imatrix_1 * Re2;
+
+        *((*num).Re) = New_Re;
+        *((*num).Im) = New_Im;
+    }
 }
 
 number *get_elem(Matrix *Matrix_info, int index){
@@ -270,7 +332,7 @@ Matrix* create_matrix(int rank_matrix, int epsilon_num, int question_of_type){
         return NULL;
     }
 
-    int question_of_random = question("Введите < y > если заполнить матрицу рандомом или < n > если вводить вручную : ");
+    int question_of_random = question("Выберите способ заполнения матрицы:\n[y] Случайные значения\n[n] Ввод вручную\nВвод : ");
 
     if (question_of_random == 0){
         if (question_of_type == 0){
@@ -296,7 +358,8 @@ Matrix* create_matrix(int rank_matrix, int epsilon_num, int question_of_type){
                     free(elem);
                 }
             }
-        } else{
+        } 
+        else{
             for (int i = 0; i < rank_matrix; i++){
                 for (int k = 0; k < rank_matrix; k++){
                     printf("\nВведите a%d%d : ", i+1, k+1);
@@ -362,10 +425,10 @@ Matrix* create_matrix(int rank_matrix, int epsilon_num, int question_of_type){
     (*matrix).rank_of_matrix = rank_matrix;
     (*matrix).len_matrix = rank_matrix * rank_matrix;
     if (question_of_type == 0){
-        (*matrix).typeinfo = &complex_array_typeinfo;
+        (*matrix).typeinfo = &complex_address_typeinfo;
     }
     else{
-        (*matrix).typeinfo = &float_array_typeinfo;
+        (*matrix).typeinfo = &float_address_typeinfo;
     }
     return matrix;
 }
@@ -391,12 +454,12 @@ Matrix* matrix_summ(Matrix* matrix1, Matrix* matrix2){
         return NULL;
     }
 
-    number* m1 = (*matrix1).Matrix;
-    number* m2 = (*matrix2).Matrix;
+    number* matrix_1 = (*matrix1).Matrix;
+    number* matrix_2 = (*matrix2).Matrix;
 
     for (int i = 0; i < rank_of_matrix * rank_of_matrix; i++){
-        TypeInfo* info = m1[i].type_info;
-        void* sum = (*info).summ(m1[i].type_num, m2[i].type_num);
+        TypeInfo* info = matrix_1[i].type_info;
+        void* sum = (*info).summ(matrix_1[i].type_num, matrix_2[i].type_num);
         if (sum == NULL){
             for (int j = 0; j < i; j++){
                 free(result_data[j].type_num);
@@ -437,22 +500,22 @@ Matrix* matrix_multiply(Matrix* matrix1, Matrix* matrix2){
         return NULL;
     }
 
-    number* m1 = (*matrix1).Matrix;
-    number* m2 = (*matrix2).Matrix;
+    number* matrix_1 = (*matrix1).Matrix;
+    number* matrix_2 = (*matrix2).Matrix;
 
     for (int i = 0; i < rank_of_matrix; i++){
         for (int j = 0; j < rank_of_matrix; j++){
 
             int index = i * rank_of_matrix + j;
             void* sum_data = NULL;
-            TypeInfo* info = m1[i*rank_of_matrix].type_info;
+            TypeInfo* info = matrix_1[i*rank_of_matrix].type_info;
 
             for (int k = 0; k < rank_of_matrix; k++){
 
                 int indexA = i * rank_of_matrix + k;
                 int indexB = k * rank_of_matrix + j;
 
-                void* result_multiply = (*info).multiply(m1[indexA].type_num, m2[indexB].type_num);
+                void* result_multiply = (*info).multiply(matrix_1[indexA].type_num, matrix_2[indexB].type_num);
 
                 if (result_multiply == NULL){
                     if (sum_data != NULL){
@@ -517,14 +580,17 @@ Matrix* matrix_multiply(Matrix* matrix1, Matrix* matrix2){
     return result;
 }
 
-Matrix* matrix_scalar_multiply(Matrix* matrix, float scalar){
+Matrix* matrix_scalar_multiply(Matrix* matrix, void *scalar, int type_scalar){
     if (matrix == NULL){
         return NULL;
     }
+
     int rank_of_matrix = (*matrix).rank_of_matrix;
 
     Matrix* result = malloc(sizeof(Matrix));
-    if (result == NULL) return NULL;
+    if (result == NULL){
+        return NULL;
+    }
 
     number* result_data = malloc(rank_of_matrix * rank_of_matrix * sizeof(number));
     if (result_data == NULL){
@@ -534,70 +600,178 @@ Matrix* matrix_scalar_multiply(Matrix* matrix, float scalar){
 
     number* main_matrix = (*matrix).Matrix;
 
+    int trigger_error = 1;
+
     for (int i = 0; i < rank_of_matrix * rank_of_matrix; i++){
         TypeInfo* info = main_matrix[i].type_info;
         void* main_matrix_data = main_matrix[i].type_num;
-        void* new_elem = NULL;
+
+        TypeInfo* result_info = info;
+        void* new_elem_data = NULL;
 
         if (info == &float_typeinfo){
-            float* float_new_elem = malloc(sizeof(float));
-            if (float_new_elem == NULL){
-                for (int j = 0; j < i; j++) free(result_data[j].type_num);
-                free(result_data);
-                free(result);
-                return NULL;
+            if (type_scalar == 0){
+                float old_float_val = *(float*)main_matrix_data;
+
+                Complex_number* number_complex = malloc(sizeof(Complex_number));
+                if (number_complex == NULL){
+                    trigger_error = 0;
+                    break;
+                }
+
+                (*number_complex).Re = malloc(sizeof(int));
+                (*number_complex).Im = malloc(sizeof(int));
+                if ((*number_complex).Re == NULL || (*number_complex).Im == NULL){
+                    free((*number_complex).Re);
+                    free((*number_complex).Im);
+                    free(number_complex);
+                    trigger_error = 0;
+                    break;
+                }
+
+                *((*number_complex).Re) = (int)old_float_val;
+                *((*number_complex).Im) = 0;
+
+                Complex_number* scalar_complex = (Complex_number*)scalar;
+
+                int Re1 = *((*number_complex).Re);
+                int Imatrix_1 = *((*number_complex).Im);
+                int Re2 = *((*scalar_complex).Re);
+                int Imatrix_2 = *((*scalar_complex).Im);
+
+                Complex_number* final_complex = malloc(sizeof(Complex_number));
+                if (final_complex == NULL){
+                    free((*number_complex).Re);
+                    free((*number_complex).Im);
+                    free(number_complex);
+                    trigger_error = 0;
+                    break;
+                }
+
+                (*final_complex).Re = malloc(sizeof(int));
+                (*final_complex).Im = malloc(sizeof(int));
+                if ((*final_complex).Re == NULL || (*final_complex).Im == NULL){
+                    free((*final_complex).Re);
+                    free((*final_complex).Im);
+                    free(final_complex);
+                    free((*number_complex).Re);
+                    free((*number_complex).Im);
+                    free(number_complex);
+                    trigger_error = 0;
+                    break;
+                }
+
+                *((*final_complex).Re) = Re1 * Re2 - Imatrix_1 * Imatrix_2;
+                *((*final_complex).Im) = Re1 * Imatrix_2 + Imatrix_1 * Re2;
+
+                free((*number_complex).Re);
+                free((*number_complex).Im);
+                free(number_complex);
+
+                new_elem_data = final_complex;
+                result_info = &complex_typeinfo;
             }
-            *float_new_elem = *(float*)main_matrix_data;
-            new_elem = float_new_elem;
+            else{
+                float* copy_float = malloc(sizeof(float));
+                if (copy_float == NULL){
+                    trigger_error = 0;
+                    break;
+                }
+
+                *copy_float = *(float*)main_matrix_data;
+                *copy_float = (*copy_float) * (*(float*)scalar);
+
+                new_elem_data = copy_float;
+                result_info = &float_typeinfo;
+            }
         }
         else{
             if (info == &complex_typeinfo){
-                Complex_number* copy_main_matrix = (Complex_number*)main_matrix_data;
-                Complex_number* copy_new_elem = malloc(sizeof(Complex_number));
-                if (copy_new_elem == NULL){
-                    for (int j = 0; j < i; j++){
-                        free(result_data[j].type_num);
-                    }
-                    free(result_data);
-                    free(result);
-                    return NULL;
-                }
-                (*copy_new_elem).Re = malloc(sizeof(int));
-                (*copy_new_elem).Im = malloc(sizeof(int));
-                if ((*copy_new_elem).Re == NULL || (*copy_new_elem).Im == NULL){
-                    free((*copy_new_elem).Re);
-                    free((*copy_new_elem).Im);
-                    free(copy_new_elem);
-                    for (int j = 0; j < i; j++) free(result_data[j].type_num);
-                    free(result_data);
-                    free(result);
-                    return NULL;
+                Complex_number* original_complex = (Complex_number*)main_matrix_data;
+
+                Complex_number* copy_complex = malloc(sizeof(Complex_number));
+                if (copy_complex == NULL){
+                    trigger_error = 0;
+                    break;
                 }
 
-                *(*copy_new_elem).Re = *(*copy_main_matrix).Re;
-                *(*copy_new_elem).Im = *(*copy_main_matrix).Im;
-                new_elem = copy_new_elem;
-            } 
-            else{
-                for (int j = 0; j < i; j++){
-                    free(result_data[j].type_num);
+                (*copy_complex).Re = malloc(sizeof(int));
+                (*copy_complex).Im = malloc(sizeof(int));
+                if ((*copy_complex).Re == NULL || (*copy_complex).Im == NULL){
+                    free((*copy_complex).Re);
+                    free((*copy_complex).Im);
+                    free(copy_complex);
+                    trigger_error = 0;
+                    break;
                 }
-                free(result_data);
-                free(result);
-                return NULL;
+
+                *((*copy_complex).Re) = *((*original_complex).Re);
+                *((*copy_complex).Im) = *((*original_complex).Im);
+
+                if (type_scalar == 1){
+                    int Re1 = *((*copy_complex).Re);
+                    int Imatrix_1 = *((*copy_complex).Im);
+                    float scalar_float = *(float*)scalar;
+
+                    *((*copy_complex).Re) = (int)((float)Re1 * scalar_float);
+                    *((*copy_complex).Im) = (int)((float)Imatrix_1 * scalar_float);
+                }
+                else{
+                    Complex_number* scalar_complex = (Complex_number*)scalar;
+
+                    int Re1 = *((*copy_complex).Re);
+                    int Imatrix_1 = *((*copy_complex).Im);
+                    int Re2 = *((*scalar_complex).Re);
+                    int Imatrix_2 = *((*scalar_complex).Im);
+
+                    int New_Re = Re1 * Re2 - Imatrix_1 * Imatrix_2;
+                    int New_Im = Re1 * Imatrix_2 + Imatrix_1 * Re2;
+
+                    *((*copy_complex).Re) = New_Re;
+                    *((*copy_complex).Im) = New_Im;
+                }
+
+                new_elem_data = copy_complex;
+                result_info = &complex_typeinfo;
+            }
+            else{
+                trigger_error = 0;
+                break;
             }
         }
-        
 
-        (*info).scalar_multiply(scalar, new_elem);
-        result_data[i].type_num = new_elem;
-        result_data[i].type_info = info;
+        result_data[i].type_num = new_elem_data;
+        result_data[i].type_info = result_info;
+    }
+
+    if (trigger_error == 0){
+        for (int j = 0; j < rank_of_matrix * rank_of_matrix; j++){
+            if (result_data[j].type_info == &float_typeinfo){
+                free(result_data[j].type_num);
+            }
+            else{
+                Complex_number* complex_elem = (Complex_number*)result_data[j].type_num;
+                free((*complex_elem).Re);
+                free((*complex_elem).Im);
+                free(complex_elem);
+            }
+        }
+
+        free(result_data);
+        free(result);
+        return NULL;
     }
 
     (*result).Matrix = result_data;
     (*result).rank_of_matrix = rank_of_matrix;
     (*result).len_matrix = rank_of_matrix * rank_of_matrix;
-    (*result).typeinfo = (*matrix).typeinfo;
+
+    if (result_data[0].type_info == &complex_typeinfo){
+        (*result).typeinfo = &complex_address_typeinfo;
+    }
+    else{
+        (*result).typeinfo = &float_address_typeinfo;
+    }
 
     return result;
 }

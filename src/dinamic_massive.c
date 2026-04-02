@@ -3,9 +3,9 @@
 #include <stdlib.h>
 
 void* add_forward_float(Matrix* matrix){
-    number* arr = (*matrix).Matrix;
+    number* address = (*matrix).Matrix;
     int len = (*matrix).len_matrix;
-    number* new_address = realloc(arr, (len + 1) * sizeof(number));
+    number* new_address = realloc(address, (len + 1) * sizeof(number));
     if (new_address == NULL){
         return NULL;
     }
@@ -19,11 +19,13 @@ void* add_forward_float(Matrix* matrix){
 }
 
 void* add_forward_complex(Matrix* matrix){
-    number* arr = (*matrix).Matrix;
+    number* address = (*matrix).Matrix;
     int len = (*matrix).len_matrix;
-    number* new_address = realloc(arr, (len + 1) * sizeof(number));
-    if (new_address == NULL) return NULL;
-
+    number* new_address = realloc(address, (len + 1) * sizeof(number));
+    if (new_address == NULL){
+        return NULL;
+    }
+    
     int index = len;
     new_address[index].type_num = NULL;
     new_address[index].type_info = &complex_typeinfo;
@@ -33,10 +35,12 @@ void* add_forward_complex(Matrix* matrix){
     return new_address;
 }
 
-TypeInfo_Matrix float_array_typeinfo ={
+TypeInfo_Matrix float_address_typeinfo ={
     .add_forward = add_forward_float
 };
 
-TypeInfo_Matrix complex_array_typeinfo ={
+
+TypeInfo_Matrix complex_address_typeinfo ={
     .add_forward = add_forward_complex
 };
+
