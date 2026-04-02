@@ -42,14 +42,14 @@ float input_number(float min_side, float max_side, int type_num){
     float num = 0.0;
     char char_buffer;
     if(type_num == 0){
-        while(scanf("%f", &num) != 1 || (num < min_side || num > max_side)){
+        while(scanf("%f%c", &num, &char_buffer) != 2 || char_buffer != '\n' || (num < min_side || num > max_side)){
             printf("Oшибка! Введите число от %.2f до %.2f : ", min_side, max_side);
             while ((char_buffer = getchar()) != '\n' && char_buffer != EOF);
         }
         return num; 
     }
     if(type_num == 1){
-        while(scanf("%f", &num) != 1 || (num < min_side || num > max_side) || (int)num % 10 > (int)max_side % 10){
+        while(scanf("%f%c", &num, &char_buffer) != 2 || char_buffer != '\n' || (num < min_side || num > max_side) || (int)num % 10 > (int)max_side % 10){
             printf("Oшибка! Введите корректный индекс от %.0f до %.0f : ", min_side, max_side);
             while ((char_buffer = getchar()) != '\n' && char_buffer != EOF);
         }
@@ -59,7 +59,6 @@ float input_number(float min_side, float max_side, int type_num){
         return k;
     }
     return 1;
-    
 }
 
 int input_data(){
@@ -70,7 +69,7 @@ int input_data(){
     int len_counter = 0, rank_matrix = 0, question_of_type, len_matrix = 0, question_of_change = 0, index = 0, qestion_stop = 0;
     char question_start[2], char_buffer;
     float scalar = 0.0;
-    printf("╔════════════════════════════════════╗\n║     Матричный калькулятор 2.8      ║\n╠════════════════════════════════════╣\n║  [s] -> Сложение матриц            ║\n║  [m] -> Умножение матриц           ║\n║  [k] -> Умножение на скаляр        ║\n╚════════════════════════════════════╝");
+    printf("╔════════════════════════════════════╗\n║     Матричный калькулятор 2.9      ║\n╠════════════════════════════════════╣\n║  [s] -> Сложение матриц            ║\n║  [m] -> Умножение матриц           ║\n║  [k] -> Умножение на скаляр        ║\n╚════════════════════════════════════╝");
     printf("\nВведите команду... ");
     while (1){
         len_counter = 0;
